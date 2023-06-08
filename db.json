@@ -1,0 +1,25 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "subhan",
+      "address": "Pakistan,Lahore",
+      "email": "subhan@gmail.com",
+      "contact": "123456789"
+    },
+    {
+      "id": 2,
+      "name": "subhan",
+      "address": "Pakistan,Lahore",
+      "email": "subhan@gmail.com",
+      "contact": "123456789"
+    },
+    {
+      "id": 3,
+      "name": "subhan",
+      "address": "Pakistan,Lahore",
+      "email": "subhan@gmail.com",
+      "contact": "123456789"
+    }
+  ]
+}
