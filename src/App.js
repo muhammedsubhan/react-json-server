@@ -27,13 +27,14 @@ const App = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch("http://localhost:8000/users");
-      const resData = await response.json();
-      setData(resData);
-    };
     fetchData();
   }, []);
+
+  const fetchData = async () => {
+    const response = await fetch("http://localhost:8000/users");
+    const resData = await response.json();
+    setData(resData);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -69,7 +70,20 @@ const App = () => {
         address: "",
         contact: "",
       });
+      setTimeout(() => {
+        fetchData();
+      }, 500);
     }
+  };
+
+  const handleDelete = async (id) => {
+    await fetch(`http://localhost:8000/users/${id}`, {
+      method: "DELETE",
+    });
+    toast.success("Successfully Deleted");
+    setTimeout(() => {
+      fetchData();
+    }, 500);
   };
 
   return (
@@ -167,6 +181,7 @@ const App = () => {
                             <Button
                               style={{ marginTop: "5px" }}
                               variant="danger"
+                              onClick={() => handleDelete(item.id)}
                             >
                               Delete
                             </Button>
