@@ -25,17 +25,21 @@ const App = () => {
   const { name, email, contact, address } = state;
 
   const [data, setData] = useState([]);
+  const [editToggle, setEditToggle] = useState(false);
+  const [userID, setUserID] = useState(null);
 
+  // Use Effect Hook
   useEffect(() => {
     fetchData();
   }, []);
-
+  // *******Fetching Data*******
   const fetchData = async () => {
     const response = await fetch("http://localhost:8000/users");
     const resData = await response.json();
     setData(resData);
   };
 
+  // *******Handle onChange*******
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -44,38 +48,68 @@ const App = () => {
     });
   };
 
+  // *******Handle Submit*******
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!name || !email || !contact || !address) {
       toast.error("Please Fill All The Fields");
     } else {
-      await fetch("http://localhost:8000/users", {
-        method: "POST",
-        body: JSON.stringify({
-          name: name,
-          email: email,
-          address: address,
-          contact: contact,
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-      });
-      // axios.post("http://localhost:8000/users", state);
-      toast.success("Added in Json Server");
-      setState({
-        name: "",
-        email: "",
-        address: "",
-        contact: "",
-      });
-      setTimeout(() => {
-        fetchData();
-      }, 500);
+      if (!editToggle) {
+        await fetch("http://localhost:8000/users", {
+          method: "POST",
+          body: JSON.stringify({
+            name: name,
+            email: email,
+            address: address,
+            contact: contact,
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        });
+        // axios.post("http://localhost:8000/users", state);
+        toast.success("Added in Json Server");
+        setState({
+          name: "",
+          email: "",
+          address: "",
+          contact: "",
+        });
+        setTimeout(() => {
+          fetchData();
+        }, 500);
+      } else {
+        await fetch(`http://localhost:8000/users/${userID}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            name: name,
+            email: email,
+            address: address,
+            contact: contact,
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        });
+
+        // axios.put(`http://localhost:8000/users/${userID}`, state);
+        toast.success("Updated Successfully");
+        setState({
+          name: "",
+          email: "",
+          address: "",
+          contact: "",
+        });
+        setTimeout(() => {
+          fetchData();
+        }, 500);
+        setEditToggle(false);
+        setUserID(null);
+      }
     }
   };
-
+  // *******Handle Delete*******
   const handleDelete = async (id) => {
     await fetch(`http://localhost:8000/users/${id}`, {
       method: "DELETE",
@@ -84,6 +118,14 @@ const App = () => {
     setTimeout(() => {
       fetchData();
     }, 500);
+  };
+
+  // *******Handle Update*******
+  const handleUpdate = (id) => {
+    const singleUser = data.find((item) => item.id === id);
+    setState({ ...singleUser });
+    setUserID(id);
+    setEditToggle(true);
   };
 
   return (
@@ -141,9 +183,15 @@ const App = () => {
                 />
               </Form.Group>
               <div className="d-grid gap-2 mt-2">
-                <Button type="submit" variant="primary" size="lg">
-                  Submit
-                </Button>
+                {editToggle ? (
+                  <Button type="submit" variant="primary" size="lg">
+                    Update Data
+                  </Button>
+                ) : (
+                  <Button type="submit" variant="primary" size="lg">
+                    Submit
+                  </Button>
+                )}
               </div>
             </Form>
           </Col>
@@ -174,6 +222,7 @@ const App = () => {
                             <Button
                               style={{ marginTop: "5px", marginRight: "5px" }}
                               variant="secondary"
+                              onClick={() => handleUpdate(item.id)}
                             >
                               Update
                             </Button>
